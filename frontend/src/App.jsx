@@ -5,7 +5,7 @@ import Editor from "@monaco-editor/react";
 
 // Removed: import { response } from "express";
 
-const socket = io("http://localhost:5000");
+const socket = io("https://blinkcompiler2.onrender.com");
 
 socket.on("connect", () => {
   console.log("Connected to socket server:", socket.id);
