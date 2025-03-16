@@ -8,17 +8,18 @@ import axios from "axios";
 const app = express();
 const server = http.createServer(app);
 
+// URL to ping (to keep the site awake on Render)
 const url = `https://render-hosting-se2b.onrender.com`;
 const interval = 30000;
 
 function reloadWebsite() {
   axios
     .get(url)
-    .then((response) => {
-      console.log("website reloded");
+    .then(() => {
+      console.log("Website reloaded");
     })
     .catch((error) => {
-      console.error(`Error : ${error.message}`);
+      console.error(`Error: ${error.message}`);
     });
 }
 
@@ -44,10 +45,14 @@ io.on("connection", (socket) => {
   let currentUser = null;
 
   socket.on("join", ({ roomId, userName }) => {
+    // If already in a room, leave that room first
     if (currentRoom) {
       socket.leave(currentRoom);
-      rooms.get(currentRoom).delete(currentUser);
-      io.to(currentRoom).emit("userJoined", Array.from(rooms.get(currentRoom)));
+      const roomSet = rooms.get(currentRoom);
+      if (roomSet) {
+        roomSet.delete(currentUser);
+        io.to(currentRoom).emit("userJoined", Array.from(roomSet));
+      }
     }
 
     currentRoom = roomId;
@@ -57,7 +62,6 @@ io.on("connection", (socket) => {
     if (!rooms.has(roomId)) {
       rooms.set(roomId, new Set());
     }
-
     rooms.get(roomId).add(userName);
     io.to(roomId).emit("userJoined", Array.from(rooms.get(roomId)));
   });
@@ -68,8 +72,11 @@ io.on("connection", (socket) => {
 
   socket.on("leaveRoom", () => {
     if (currentRoom && currentUser) {
-      rooms.get(currentRoom).delete(currentUser);
-      io.to(currentRoom).emit("userJoined", Array.from(rooms.get(currentRoom)));
+      const roomSet = rooms.get(currentRoom);
+      if (roomSet) {
+        roomSet.delete(currentUser);
+        io.to(currentRoom).emit("userJoined", Array.from(roomSet));
+      }
       socket.leave(currentRoom);
       currentRoom = null;
       currentUser = null;
@@ -84,27 +91,32 @@ io.on("connection", (socket) => {
     io.to(roomId).emit("languageUpdate", language);
   });
 
-  socket.on("compileCode",async({code,roomId,language,version})=>{
-    if(rooms.has(roomId)){
-      const room = rooms.get(roomId)
-      const response = await axios.post("https://emkc.org/api/v2/piston/execute",{
+  socket.on("compileCode", async ({ code, roomId, language, version }) => {
+    try {
+      const response = await axios.post("https://emkc.org/api/v2/piston/execute", {
         language,
         version,
-        files:[
+        files: [
           {
-            content: code
-          }
-        ]
-      })
-      room.output = response.data.run.output
-      io.to(roomId).emit("codeResponse",response.data)
+            content: code,
+          },
+        ],
+      });
+      // Emit the code response directly to the room
+      io.to(roomId).emit("codeResponse", response.data);
+    } catch (error) {
+      console.error("Error compiling code:", error.message);
+      io.to(roomId).emit("codeResponse", { error: error.message });
     }
-  })
+  });
 
   socket.on("disconnect", () => {
     if (currentRoom && currentUser) {
-      rooms.get(currentRoom).delete(currentUser);
-      io.to(currentRoom).emit("userJoined", Array.from(rooms.get(currentRoom)));
+      const roomSet = rooms.get(currentRoom);
+      if (roomSet) {
+        roomSet.delete(currentUser);
+        io.to(currentRoom).emit("userJoined", Array.from(roomSet));
+      }
     }
     console.log("User Disconnected");
   });
@@ -112,12 +124,15 @@ io.on("connection", (socket) => {
 
 const port = process.env.PORT || 5000;
 
-app.use(express.static(path.join(__dirname, "frontend", "dist")));
+// Update static file paths: move one level up to access frontend/dist
+const staticPath = path.join(__dirname, "../frontend/dist");
+app.use(express.static(staticPath));
 
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
+  res.sendFile(path.join(staticPath, "index.html"));
 });
 
 server.listen(port, () => {
   console.log(`Server is working on port ${port}`);
 });
+
