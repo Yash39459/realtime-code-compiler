@@ -1,0 +1,204 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Roboto", "sans-serif";
+  background: #f0f2f5;
+  color: #333;
+}
+
+/* New outer container to split the screen */
+.outer-container {
+  display: flex;
+  height: 100vh;
+}
+
+/* Left container holds the unchanged join form */
+.left-container {
+  flex: 1;
+}
+
+/* Right container with the background image */
+.right-container {
+  flex: 1;
+  background: url("https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D") no-repeat center center;
+  background-size: cover;
+}
+
+/* Your original join-container styles (untouched) */
+.join-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.join-container .join-form {
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 300px;
+}
+
+.join-container .join-form h1 {
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.join-container .join-form input {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.join-container .join-form button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.join-container .join-form button:hover {
+  background-color: #357abd;
+}
+
+/* Editor container and its nested styles */
+.editor-container {
+  display: flex;
+  height: 100vh;
+}
+
+.editor-container .sidebar {
+  width: 250px;
+  padding: 1.5rem;
+  background-color: #2c3e50;
+  color: #ecf0f1;
+}
+
+.editor-container .sidebar .room-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.editor-container .sidebar .room-info h2 {
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.editor-container .sidebar .room-info .copy-button {
+  padding: 0.5rem 1rem;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.editor-container .sidebar .room-info .copy-button:hover {
+  background-color: #2980b9;
+}
+
+/* Users list header */
+.editor-container .sidebar .h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+/* Users list */
+.editor-container .sidebar ul,
+.editor-container .sidebar .ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Each user displayed in a gray box with dark text for better visibility */
+.editor-container .sidebar ul li,
+.editor-container .sidebar .ul .li {
+  padding: 0.75rem;
+  font-size: 0.9rem;
+  background-color: #d3d3d3;
+  border: 1px solid #bbb;
+  margin-top: 5px;
+  border-radius: 5px;
+  color: #333;
+}
+
+/* Typing indicator */
+.editor-container .sidebar .typing-indicator {
+  margin-top: 1rem;
+  font-size: 1rem;
+  color: white;
+}
+
+/* Language selector */
+.editor-container .sidebar .language-selector {
+  margin-top: 1rem;
+  width: 100%;
+  padding: 0.5rem;
+  background-color: #34495e;
+  color: white;
+  border: none;
+  border-radius: 4px;
+}
+
+/* Leave button */
+.editor-container .sidebar .leave-button {
+  margin-top: 1rem;
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.editor-container .sidebar .leave-button:hover {
+  background-color: #ab2a1c;
+}
+
+.editor-container .editor-wrapper {
+  flex-grow: 1;
+  background-color: #fff;
+}
+
+.editor-container .sidebar .room-info .copy-success {
+  margin-left: 0.5rem;
+  color: rgb(38, 167, 38);
+  font-size: 0.8rem;
+}
+
+.run-btn{
+  background-color: rgb(12, 209,38);
+  padding: 10;
+}
+
+.output-console{
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  font-size: 20px;
+  height: 200px;
+}
