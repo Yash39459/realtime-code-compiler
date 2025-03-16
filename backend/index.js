@@ -4,12 +4,19 @@ import { Server } from "socket.io";
 import path from "path";
 import { fileURLToPath } from "url";
 import axios from "axios";
+import fs from "fs";
 
 const app = express();
 const server = http.createServer(app);
 
-// URL to ping (to keep the site awake on Render)
-const url = `https://render-hosting-se2b.onrender.com`;
+// Set the URL based on environment:
+// In production, use your deployed URL (with trailing slash)
+// In development, use localhost.
+const url = process.env.NODE_ENV === "production"
+  ? "https://render-hosting-se2b.onrender.com/"
+  : "http://localhost:5000/";
+
+// Interval for the ping (to keep the site awake on Render)
 const interval = 30000;
 
 function reloadWebsite() {
@@ -19,11 +26,14 @@ function reloadWebsite() {
       console.log("Website reloaded");
     })
     .catch((error) => {
-      console.error(`Error: ${error.message}`);
+      console.error(`Reload error: ${error.message}`);
     });
 }
 
-setInterval(reloadWebsite, interval);
+// Only run the reload ping in production (or adjust as needed)
+if (process.env.NODE_ENV === "production") {
+  setInterval(reloadWebsite, interval);
+}
 
 const io = new Server(server, {
   cors: {
@@ -35,6 +45,17 @@ const io = new Server(server, {
 // Fix __dirname in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Determine the path to your built frontend files
+// Adjust the "../frontend/dist" if your project structure differs.
+const staticPath = path.join(__dirname, "../frontend/dist");
+console.log("Static files path:", staticPath);
+
+// Check if index.html exists at the expected location
+const indexPath = path.join(staticPath, "index.html");
+if (!fs.existsSync(indexPath)) {
+  console.error("index.html not found at:", indexPath);
+}
 
 const rooms = new Map();
 
@@ -124,15 +145,16 @@ io.on("connection", (socket) => {
 
 const port = process.env.PORT || 5000;
 
-// Update static file paths: move one level up to access frontend/dist
-const staticPath = path.join(__dirname, "../frontend/dist");
+// Serve static files from the frontend build folder
 app.use(express.static(staticPath));
 
+// Catch-all route to serve index.html for any route (for SPA routing)
 app.get("*", (req, res) => {
-  res.sendFile(path.join(staticPath, "index.html"));
+  res.sendFile(indexPath);
 });
 
 server.listen(port, () => {
   console.log(`Server is working on port ${port}`);
 });
+
 
